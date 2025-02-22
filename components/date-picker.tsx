@@ -11,6 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { useState } from 'react';
 
 // Accept `onSelect` as a prop
 interface DatePickerProps {
@@ -19,16 +20,18 @@ interface DatePickerProps {
 
 export function DatePicker({ onSelect }: DatePickerProps) {
   const [date, setDate] = React.useState<Date>()
+  const [isPickerVisible, setPickerVisible] = useState(false);
 
   const handleSelect = (selectedDate: Date | undefined) => {
     setDate(selectedDate)
+    setPickerVisible(false); // Close the date picker overlay
     if (onSelect) {
       onSelect(selectedDate) // Call parent-provided onSelect function
     }
   }
 
   return (
-    <Popover>
+    <Popover >
       <PopoverTrigger asChild>
         <Button
           variant={"outline"}
