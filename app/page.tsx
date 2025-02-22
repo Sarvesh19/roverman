@@ -8,15 +8,25 @@ import { Search, Users, Clock, Shield, MapPin } from "lucide-react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { useEffect } from "react";
 
 export default function Home() {
   const router = useRouter()
+
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
   const [searchParams, setSearchParams] = useState({
     from: "",
     to: "",
     date: "",
     passengers: "1"
   })
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsDarkMode(window.matchMedia("(prefers-color-scheme: dark)").matches);
+    }
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()

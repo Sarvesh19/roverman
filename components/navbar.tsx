@@ -41,7 +41,7 @@ export default function Navbar() {
         </NavigationMenu>
 
         <div className="ml-auto flex items-center space-x-4">
-          <ModeToggle />
+          {/* <ModeToggle /> */}
           <Button 
             variant="outline" 
             size="icon"
