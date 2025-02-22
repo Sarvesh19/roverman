@@ -147,26 +147,7 @@ export default function FindRides() {
 
         <div className="h-[calc(100vh-2rem)] sticky top-4">
           <Card className="h-full p-0 overflow-hidden">
-            <MapContainer
-              center={[46.2276, 2.2137]}
-              zoom={6}
-              className="h-full w-full"
-            >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              {/* {rides.map((ride) => (
-                <Marker key={ride.id} position={ride.position}>
-                  <Popup>
-                    <div className="text-sm">
-                      <div className="font-semibold">{ride.from} → {ride.to}</div>
-                      <div>€{ride.price} · {ride.seats} seats</div>
-                    </div>
-                  </Popup>
-                </Marker>
-              ))} */}
-            </MapContainer>
+           
           </Card>
         </div>
       </div>
