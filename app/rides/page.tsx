@@ -20,6 +20,15 @@ export default function FindRides() {
     passengers: searchParams.get("passengers") || "1"
   })
 
+  type Ride = {
+    id: string;
+    position: [number, number]; // Ensure it's a tuple
+    from: string;
+    to: string;
+    price: number;
+    seats: number;
+  };
+
   const [rides] = useState([
     {
       id: 1,
@@ -147,7 +156,7 @@ export default function FindRides() {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-              {rides.map((ride) => (
+              {/* {rides.map((ride) => (
                 <Marker key={ride.id} position={ride.position}>
                   <Popup>
                     <div className="text-sm">
@@ -156,7 +165,7 @@ export default function FindRides() {
                     </div>
                   </Popup>
                 </Marker>
-              ))}
+              ))} */}
             </MapContainer>
           </Card>
         </div>

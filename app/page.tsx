@@ -67,11 +67,12 @@ export default function Home() {
                 <div>
                   <label className="text-sm font-medium mb-2 block">Date</label>
                   <DatePicker 
-                    onSelect={(date) => setSearchParams(prev => ({ 
-                      ...prev, 
-                      date: date ? date.toISOString().split('T')[0] : "" 
-                    }))}
-                  />
+  onSelect={(date) => setSearchParams(prev => ({ 
+    ...prev, 
+    date: date ? date.toISOString().split('T')[0] : "" 
+  }))}
+/>
+
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-2 block">Passengers</label>
