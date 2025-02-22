@@ -99,6 +99,7 @@ export default function Home() {
                   <div className="relative">
                     <Input
                       placeholder="Enter departure city"
+                      className="text-[16px]"
                       value={searchParams.from}
                       onChange={(e) => {
                         setSearchParams((prev) => ({ ...prev, from: e.target.value }));
@@ -136,6 +137,7 @@ export default function Home() {
                     <Input
                       placeholder="Enter destination city"
                       value={searchParams.to}
+                      className="text-[16px]"
                       onChange={(e) => {
                         setSearchParams((prev) => ({ ...prev, to: e.target.value }));
                         handleAddressSearch(e.target.value, "to");
@@ -199,6 +201,84 @@ export default function Home() {
           </Card>
         </div>
       </section>
+
+      <section className="py-24 bg-background">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-16">How RideShare Works</h2>
+          <div className="grid md:grid-cols-3 gap-12">
+            <div className="text-center">
+              <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+                <MapPin className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4">Find Your Route</h3>
+              <p className="text-muted-foreground">
+                Enter your departure and destination cities to discover available rides that match your travel plans.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Users className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4">Choose Your Ride</h3>
+              <p className="text-muted-foreground">
+                Browse through verified drivers, compare prices, and select the ride that best suits your needs.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Clock className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4">Book Instantly</h3>
+              <p className="text-muted-foreground">
+                Book your seat with just a few clicks and get instant confirmation for your journey.
+              </p>
+            </div>
+            </div>
+            </div>
+        </section>
+      
+      <section className="py-24 bg-muted">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-3xl font-bold mb-6">Why Choose RideShare?</h2>
+            <p className="text-xl text-muted-foreground mb-12">
+              Join millions of users who trust RideShare for their travel needs
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <Card className="p-6">
+              <Shield className="h-12 w-12 text-primary mb-4" />
+              <h3 className="font-semibold mb-2">Secure Booking</h3>
+              <p className="text-sm text-muted-foreground">
+                Verified profiles and secure payment system for peace of mind
+              </p>
+            </Card>
+            <Card className="p-6">
+              <Users className="h-12 w-12 text-primary mb-4" />
+              <h3 className="font-semibold mb-2">Community Driven</h3>
+              <p className="text-sm text-muted-foreground">
+                A trusted community of drivers and passengers
+              </p>
+            </Card>
+            <Card className="p-6">
+              <Clock className="h-12 w-12 text-primary mb-4" />
+              <h3 className="font-semibold mb-2">Flexible Times</h3>
+              <p className="text-sm text-muted-foreground">
+                Find rides that match your schedule
+              </p>
+            </Card>
+            <Card className="p-6">
+              <MapPin className="h-12 w-12 text-primary mb-4" />
+              <h3 className="font-semibold mb-2">Wide Coverage</h3>
+              <p className="text-sm text-muted-foreground">
+                Rides available across multiple cities and routes
+              </p>
+            </Card>
+          </div>
+        </div>
+      </section>
+      
+
 
       {showMap && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">

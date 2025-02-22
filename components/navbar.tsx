@@ -23,7 +23,7 @@ export default function Navbar() {
       <div className="flex h-16 items-center px-4 container mx-auto">
         <Link href="/" className="flex items-center space-x-2">
           <Car className="h-6 w-6" />
-          <span className="font-bold text-xl">RideShare</span>
+          <span className="font-bold text-xl">RidezPool</span>
         </Link>
         
         <NavigationMenu className="mx-6 hidden md:block">
