@@ -10,10 +10,21 @@ import {
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 
-export function TimePicker() {
+interface TimePickerProps {
+  onSelect?: (time: string) => void; // Define onSelect prop
+}
+
+export function TimePicker({ onSelect }: TimePickerProps) {
   const [time, setTime] = React.useState<string>("")
   const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'))
   const minutes = ['00', '15', '30', '45']
+
+  const handleSelect = (selectedTime: string) => {
+    setTime(selectedTime)
+    if (onSelect) {
+      onSelect(selectedTime) // Call parent-provided onSelect function
+    }
+  }
 
   return (
     <Popover>
@@ -39,7 +50,7 @@ export function TimePicker() {
                   key={timeString}
                   variant="ghost"
                   className="h-8"
-                  onClick={() => setTime(timeString)}
+                  onClick={() => handleSelect(timeString)}
                 >
                   {timeString}
                 </Button>

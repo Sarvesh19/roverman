@@ -1,156 +1,113 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { DatePicker } from "@/components/date-picker"
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
-import { useState, useEffect } from "react"
-import { Avatar } from "@/components/ui/avatar"
-import { AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Calendar, MapPin, Users } from "lucide-react"
-import { useSearchParams } from "next/navigation"
+import { useState, useEffect, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
+import { createClient } from "@supabase/supabase-js";
+import dynamic from "next/dynamic";
+import "leaflet/dist/leaflet.css";
+
+// Dynamically import MapContainer to disable SSR
+const MapContainer = dynamic(() => import("react-leaflet").then((m) => m.MapContainer), { ssr: false });
+const TileLayer = dynamic(() => import("react-leaflet").then((m) => m.TileLayer), { ssr: false });
+const Polyline = dynamic(() => import("react-leaflet").then((m) => m.Polyline), { ssr: false });
+const Marker = dynamic(() => import("react-leaflet").then((m) => m.Marker), { ssr: false });
+const Popup = dynamic(() => import("react-leaflet").then((m) => m.Popup), { ssr: false });
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export default function FindRides() {
-  const searchParams = useSearchParams()
-  const [searchValues, setSearchValues] = useState({
-    from: searchParams.get("from") || "",
-    to: searchParams.get("to") || "",
-    date: searchParams.get("date") || "",
-    passengers: searchParams.get("passengers") || "1"
-  })
+  const searchParams = useSearchParams();
+  const [rides, setRides] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  type Ride = {
-    id: string;
-    position: [number, number]; // Ensure it's a tuple
-    from: string;
-    to: string;
-    price: number;
-    seats: number;
-  };
+  // Memoize searchValues to prevent unnecessary re-renders
+  const searchValues = useMemo(
+    () => ({
+      fromLat: parseFloat(searchParams.get("fromLat") || "0"),
+      fromLon: parseFloat(searchParams.get("fromLng") || "0"),
+      toLat: parseFloat(searchParams.get("toLat") || "0"),
+      toLon: parseFloat(searchParams.get("toLng") || "0"),
+      rideDate: searchParams.get("date") || new Date().toISOString(),
+    }),
+    [searchParams]
+  );
 
-  const [rides] = useState([
-    {
-      id: 1,
-      from: "Paris",
-      to: "Lyon",
-      date: "2024-03-25",
-      time: "09:00",
-      price: 25,
-      seats: 3,
-      driver: {
-        name: "John D.",
-        rating: 4.8,
-        image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=100"
-      },
-      position: [48.8566, 2.3522]
-    },
-    {
-      id: 2,
-      from: "Lyon",
-      to: "Marseille",
-      date: "2024-03-25",
-      time: "14:00",
-      price: 30,
-      seats: 2,
-      driver: {
-        name: "Sarah M.",
-        rating: 4.9,
-        image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=100"
-      },
-      position: [45.7578, 4.8320]
+  useEffect(() => {
+    async function fetchRides() {
+      setLoading(true);
+      const { data, error } = await supabase.rpc("find_best_rides", {
+        user_lat: searchValues.fromLat,
+        user_lon: searchValues.fromLon,
+        dest_lat: searchValues.toLat,
+        dest_lon: searchValues.toLon,
+        ride_date: searchValues.rideDate,
+      });
+
+      if (error) {
+        console.error("Error fetching rides:", error);
+      } else {
+        setRides(data);
+      }
+      setLoading(false);
     }
-  ])
+
+    fetchRides();
+  }, [searchValues]);
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="grid lg:grid-cols-2 gap-8">
-        <div>
-          <Card className="p-6 mb-6">
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">From</label>
-                <Input 
-                  placeholder="Enter departure city" 
-                  value={searchValues.from}
-                  onChange={(e) => setSearchValues(prev => ({ ...prev, from: e.target.value }))}
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-2 block">To</label>
-                <Input 
-                  placeholder="Enter destination city"
-                  value={searchValues.to}
-                  onChange={(e) => setSearchValues(prev => ({ ...prev, to: e.target.value }))}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">Date</label>
-                <DatePicker />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-2 block">Passengers</label>
-                <Input 
-                  type="number" 
-                  min="1" 
-                  value={searchValues.passengers}
-                  onChange={(e) => setSearchValues(prev => ({ ...prev, passengers: e.target.value }))}
-                />
-              </div>
-            </div>
-          </Card>
+      {loading ? (
+        <p>Loading rides...</p>
+      ) : rides.length === 0 ? (
+        <p>No rides found.</p>
+      ) : (
+        <>
+          <h2 className="text-2xl font-bold mb-4">Best Matched Rides</h2>
 
-          <div className="space-y-4">
-            {rides.map((ride) => (
-              <Card key={ride.id} className="p-4">
-                <div className="flex items-start gap-4">
-                  <Avatar className="h-12 w-12">
-                    <AvatarImage src={ride.driver.image} alt={ride.driver.name} />
-                    <AvatarFallback>{ride.driver.name[0]}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-semibold">{ride.driver.name}</h3>
-                        <div className="text-sm text-muted-foreground">
-                          ⭐ {ride.driver.rating}
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-lg font-bold">€{ride.price}</div>
-                        <div className="text-sm text-muted-foreground">per seat</div>
-                      </div>
-                    </div>
-                    <div className="mt-4 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-muted-foreground" />
-                        <span>{ride.from} → {ride.to}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
-                        <span>{ride.date} at {ride.time}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-muted-foreground" />
-                        <span>{ride.seats} seats available</span>
-                      </div>
-                    </div>
-                    <Button className="w-full mt-4">Book Now</Button>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
+          {rides.map((ride) => (
+            <div key={ride.ride_id} className="mb-6 p-4 border rounded shadow">
+              {/* Ride Details */}
+              <h3 className="text-xl font-semibold">Ride ID: {ride.ride_id}</h3>
+              <p>
+                <strong>Location:</strong> {ride.location_name}
+              </p>
+              <p>
+                <strong>Start Time:</strong> {new Date(ride.departure_time).toLocaleString()}
+              </p>
+              <p>
+                <strong>Waypoints:</strong> {ride.waypoints_count}
+              </p>
+              <p>
+                <strong>Distance to You:</strong> {ride.distance.toFixed(2)} km
+              </p>
 
-        <div className="h-[calc(100vh-2rem)] sticky top-4">
-          <Card className="h-full p-0 overflow-hidden">
-           
-          </Card>
-        </div>
-      </div>
+              {/* Map for this ride */}
+              <MapContainer center={[ride.lat, ride.lon]} zoom={12} style={{ height: "400px", width: "100%", marginTop: "10px" }}>
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+
+                {/* Start Marker */}
+                <Marker position={[ride.lat, ride.lon]}>
+                  <Popup>Ride Start: {ride.location_name}</Popup>
+                </Marker>
+
+                {/* Destination Marker */}
+                <Marker position={[searchValues.toLat, searchValues.toLon]}>
+                  <Popup>Destination</Popup>
+                </Marker>
+
+                {/* Polyline for the ride path */}
+                <Polyline positions={[[ride.lat, ride.lon], [searchValues.toLat, searchValues.toLon]]} color="blue" />
+              </MapContainer>
+            </div>
+          ))}
+        </>
+      )}
     </div>
-  )
+  );
 }

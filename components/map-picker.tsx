@@ -32,7 +32,7 @@ const MapClickHandler = ({ onSelect }: { onSelect: (lat: number, lng: number) =>
     onSelect(lat, lng);
   });
   return null;
-};
+}; 
 
 const MapPicker = ({ onSelect, initialPosition }: MapPickerProps) => {
   const [position, setPosition] = useState<[number, number]>(initialPosition);
