@@ -52,11 +52,17 @@ export const handleSaveNewRides = async (combinedContent: any) => {
     try {
       const url = `http://router.project-osrm.org/route/v1/driving/${startLon},${startLat};${endLon},${endLat}?overview=full&geometries=geojson`;
       
+      
       const response = await axios.get(url);
       const data = response.data;
   
       if (data && data.routes.length > 0) {
-        return data.routes[0].geometry.coordinates.map(([lon, lat]: [number, number]) => ({ lat, lon }));
+        const fullWaypoints = data.routes[0].geometry.coordinates.map(([lon, lat]: [number, number]) => ({ lat, lon }));
+        
+        // Reduce waypoints: keep every 50th point (approx every 5km, depends on OSRM density)
+        const optimizedWaypoints = fullWaypoints.filter((_: any, index: number) => index % 50 === 0);
+        
+        return optimizedWaypoints;
       }
   
       return [];
