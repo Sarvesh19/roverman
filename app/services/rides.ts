@@ -48,20 +48,41 @@ export const handleSaveNewRides = async (combinedContent: any) => {
     }
   };
   
-  const fetchWaypoints = async (startLat: number, startLon: number, endLat: number, endLon: number) => {
+  const fetchWaypoints = async (
+    startLat: number,
+    startLon: number,
+    endLat: number,
+    endLon: number
+  ) => {
     try {
       const url = `http://router.project-osrm.org/route/v1/driving/${startLon},${startLat};${endLon},${endLat}?overview=full&geometries=geojson`;
-      
-      
+  
       const response = await axios.get(url);
       const data = response.data;
   
       if (data && data.routes.length > 0) {
-        const fullWaypoints = data.routes[0].geometry.coordinates.map(([lon, lat]: [number, number]) => ({ lat, lon }));
+        const route = data.routes[0];
+        const fullWaypoints = route.geometry.coordinates.map(([lon, lat]: [number, number]) => ({ lat, lon }));
         
-        // Reduce waypoints: keep every 50th point (approx every 5km, depends on OSRM density)
-        const optimizedWaypoints = fullWaypoints.filter((_: any, index: number) => index % 50 === 0);
+        // Get total distance of route in meters
+        const totalDistance = route.distance; // Distance in meters
         
+        // Target waypoint spacing in meters (5km)
+        const segmentSize = 5000; // 5km
+        const maxWaypointsPerSegment = 10; // Max 20 waypoints per segment
+        
+        // Determine number of 5km segments in the route
+        const numSegments = Math.ceil(totalDistance / segmentSize);
+  
+        // If the route is shorter than 5km, return all waypoints directly
+        if (totalDistance < segmentSize) return fullWaypoints;
+  
+        // Determine step size dynamically based on max allowed waypoints
+        const stepSize = Math.ceil(fullWaypoints.length / (numSegments * maxWaypointsPerSegment));
+  
+        // Reduce waypoints while maintaining accuracy
+        const optimizedWaypoints = fullWaypoints.filter((_: any, index: any) => index % stepSize === 0);
+  
         return optimizedWaypoints;
       }
   
@@ -71,6 +92,7 @@ export const handleSaveNewRides = async (combinedContent: any) => {
       return [];
     }
   };
+  
   
   const insertWaypoints = async (rideId: string, waypoints: { lat: number; lon: number }[]) => {
     try {
