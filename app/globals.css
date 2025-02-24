@@ -80,3 +80,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+.radix-popover-content {
+  z-index: 1000 !important;
+  position: fixed !important;
+}
